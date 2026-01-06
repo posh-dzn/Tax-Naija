@@ -37,6 +37,231 @@
             background: var(--bg-light);
         }
 
+        /* ==================== EBOOK PROMO BANNER ==================== */
+
+        .ebook-promo-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--white);
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            position: relative;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .ebook-promo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            position: relative;
+        }
+        
+        .ebook-image-wrapper {
+            flex-shrink: 0;
+        }
+        
+        .ebook-cover {
+            width: 100px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .ebook-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .ebook-badge {
+            display: inline-block;
+            background: rgba(247, 179, 43, 0.9);
+            color: var(--primary-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .ebook-title {
+            font-size: 1.3em;
+            font-weight: 900;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .ebook-description {
+            font-size: 0.95em;
+            opacity: 0.95;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .ebook-price-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .ebook-price {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        
+        .price-original {
+            font-size: 1em;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .price-sale {
+            font-size: 1.6em;
+            font-weight: 900;
+            color: var(--secondary);
+        }
+        
+        .coupon-code {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 15px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 700;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+        }
+        
+        .ebook-cta-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .btn-buy-ebook {
+            padding: 12px 35px;
+            background: var(--secondary);
+            color: var(--primary-dark);
+            border: none;
+            border-radius: 25px;
+            font-weight: 900;
+            font-size: 1.05em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(247, 179, 43, 0.4);
+        }
+        
+        .btn-buy-ebook:hover {
+            background: #ffc107;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(247, 179, 43, 0.6);
+        }
+        
+        .btn-close-banner {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border: none;
+            color: var(--white);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-close-banner:hover {
+            background: rgba(0, 0, 0, 0.4);
+            transform: scale(1.1);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .ebook-promo-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .ebook-cover {
+                width: 120px;
+                height: 168px;
+            }
+            
+            .ebook-title {
+                font-size: 1.1em;
+            }
+            
+            .ebook-description {
+                font-size: 0.9em;
+            }
+            
+            .ebook-price-section {
+                justify-content: center;
+            }
+            
+            .ebook-cta-wrapper {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn-buy-ebook {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .ebook-promo-banner {
+                padding: 15px;
+            }
+            
+            .ebook-cover {
+                width: 100px;
+                height: 140px;
+            }
+            
+            .ebook-title {
+                font-size: 1em;
+            }
+            
+            .price-sale {
+                font-size: 1.3em;
+            }
+        }
         /* Navigation */
         .navbar {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -1108,6 +1333,52 @@
         </div>
     </nav>
 
+    <!-- Ebook Promotional Banner -->
+    <div class="ebook-promo-banner" id="ebookPromoBanner">
+        <div class="ebook-promo-container">
+            <!-- Close Button -->
+            <button class="btn-close-banner" onclick="closeEbookBanner()" title="Close">✕</button>
+            
+            <!-- Book Cover Image -->
+            <div class="ebook-image-wrapper">
+                <img src="https://i.ibb.co/21rNCQ2z/1000095739.jpg" alt="1000095739" border="0">
+            </div>
+            
+            <!-- Content -->
+            <div class="ebook-content">
+                <div class="ebook-badge">🎁 Limited Time Offer</div>
+                <h3 class="ebook-title">Nigeria Tax Laws 2025</h3>
+                <p class="ebook-description">
+                    Master tax planning for 2026! Complete strategies for remote workers, business owners, 
+                    and salary earners, content creators, freelancers etc. Save thousands in taxes legally.
+                </p>
+                
+                <!-- Pricing -->
+                <div class="ebook-price-section">
+                    <div class="ebook-price">
+                        <span class="price-original">₦5,000</span>
+                        <span class="price-sale">₦3,000</span>
+                    </div>
+                    <div class="coupon-code">
+                        Use code: <strong>EarlyBird26</strong>
+                    </div>
+                </div>
+                
+                <!-- CTA -->
+                <div class="ebook-cta-wrapper">
+                    <a href="https://selar.com/h4m7n7ax60?quickcheckout=1&coupon=EarlyBird26" 
+                       class="btn-buy-ebook" 
+                       target="_blank"
+                       onclick="trackEbookClick()">
+                        🛒 Buy Now
+                    </a>
+                    <span style="font-size: 0.85em; opacity: 0.9;">
+                        ⚡ 40% OFF - Limited Time!
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Home Page -->
     <div id="homePage">
         <!-- Hero Section -->
@@ -2823,6 +3094,55 @@
             }
         }
     }
+
+    // ==================== EBOOK BANNER FUNCTIONS ====================
+
+    function closeEbookBanner() {
+        const banner = document.getElementById('ebookPromoBanner');
+        banner.style.animation = 'slideUp 0.3s ease-out';
+        setTimeout(() => {
+            banner.style.display = 'none';
+            // Remember user closed banner (won't show again for 7 days)
+            localStorage.setItem('ebookBannerClosed', Date.now());
+        }, 300);
+    }
+
+    // Slide up animation
+    const slideUpKeyframes = `
+    @keyframes slideUp {
+        from {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+    }
+    `;
+
+    // Track ebook clicks (for analytics)
+    function trackEbookClick() {
+        console.log('Ebook purchase link clicked');
+        // You can add Google Analytics tracking here later:
+        // gtag('event', 'ebook_click', { 'event_category': 'ebook', 'event_label': 'buy_now' });
+    }
+
+    // Check if banner should show (respects user's close action for 7 days)
+    function checkEbookBannerDisplay() {
+        const closedTime = localStorage.getItem('ebookBannerClosed');
+        if (closedTime) {
+            const daysSinceClosed = (Date.now() - closedTime) / (1000 * 60 * 60 * 24);
+            if (daysSinceClosed < 7) {
+                document.getElementById('ebookPromoBanner').style.display = 'none';
+            }
+        }
+    }
+
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkEbookBannerDisplay();
+    });
 
     </script>
 
