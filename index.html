@@ -1090,7 +1090,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo" onclick="showHome()">Tax<span>Naija</span></a>
+            <a href="#" class="logo" onclick="showHome()">Tax<span>Me</span></a>
             
             <!-- Burger Menu (Mobile) -->
             <div class="burger-menu" onclick="toggleMobileMenu()">
@@ -1112,8 +1112,8 @@
     <div id="homePage">
         <!-- Hero Section -->
         <section class="hero">
-            <h1>🇳🇬 Nigeria's Smartest Tax Calculator</h1>
-            <p>Track monthly. Plan annually. Stay compliant with 2026 tax laws.</p>
+            <h1>Nigeria's Smartest Tax Calculator</h1>
+            <p>Track monthly. Plan annually. Stay compliant with 2025 tax laws.</p>
             <div class="hero-buttons">
                 <button class="btn-primary" onclick="showSignup()">Start Free Trial</button>
                 <button class="btn-secondary" onclick="showQuickCalc()">Quick Calculate</button>
@@ -1152,7 +1152,7 @@
                 <div class="feature-card">
                     <div class="feature-icon">✅</div>
                     <h3>Always Updated</h3>
-                    <p>We monitor FIRS updates. You always have the latest accurate information.</p>
+                    <p>We monitor NRS updates. You always have the latest accurate information.</p>
                 </div>
             </div>
         </section>
@@ -1260,7 +1260,7 @@
             <!-- Tax Info Alert -->
             <div class="alert alert-info">
                 <strong>ℹ️ 2026 Tax Reform Update</strong><br>
-                CRA (Consolidated Relief Allowance) has been eliminated. The first ₦800,000 of income is now tax-free (0% bracket). 
+                CRA (Consolidated Relief Allowance) has been eliminated. The NRSt ₦800,000 of income is now tax-free (0% bracket). 
                 All calculations use the new progressive tax system.
             </div>
 
@@ -1320,7 +1320,7 @@
                     <div class="calendar-item">
                         <div style="font-size: 2em; margin-bottom: 10px;">🚨</div>
                         <div style="font-weight: 700; color: var(--danger); font-size: 1.05em;">Late Filing</div>
-                        <div style="color: var(--text-light); margin-top: 5px; font-size: 0.9em;">₦100k in the first month + ₦50k subsequent month</div>
+                        <div style="color: var(--text-light); margin-top: 5px; font-size: 0.9em;">₦100k in the NRSt month + ₦50k subsequent month</div>
                     </div>
                 </div>
                 
@@ -1393,7 +1393,7 @@
                         <strong>ℹ️ How This Was Calculated:</strong><br>
                         Tax is calculated progressively on your net profit:
                         <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
-                            <li>First ₦800,000: <strong>0% tax</strong> (tax-free bracket)</li>
+                            <li>NRSt ₦800,000: <strong>0% tax</strong> (tax-free bracket)</li>
                             <li>₦800k - ₦3M: <strong>15% tax</strong></li>
                             <li>₦3M - ₦12M: <strong>18% tax</strong></li>
                             <li>₦12M - ₦25M: <strong>21% tax</strong></li>
@@ -1787,7 +1787,7 @@
             loadUserData();
             showDashboard();
         } else {
-            alert('Account not found. Please sign up first.');
+            alert('Account not found. Please sign up NRSt.');
         }
     }
 
@@ -2518,7 +2518,7 @@
         }
     });
 
-    // Show disclaimer on first visit
+    // Show disclaimer on NRSt visit
     document.addEventListener('DOMContentLoaded', function() {
         const disclaimerAccepted = localStorage.getItem('TaxMe_disclaimer_accepted');
         if (!disclaimerAccepted) {
@@ -2612,7 +2612,7 @@
         // Disclaimer
         doc.setFontSize(9);
         doc.setTextColor(230, 57, 70);
-        doc.text('DISCLAIMER: This is an estimate only. Consult FIRS or a licensed tax professional.', 20, 270);
+        doc.text('DISCLAIMER: This is an estimate only. Consult NRS or a licensed tax professional.', 20, 270);
         
         // Footer
         doc.setFontSize(10);
@@ -2660,7 +2660,7 @@
             ['Above ₦50,000,000', '25%'],
             [],
             ['DISCLAIMER'],
-            ['This is an estimate only. Consult FIRS or a licensed tax professional for official filing.']
+            ['This is an estimate only. Consult NRS or a licensed tax professional for official filing.']
         ];
         
         if (Object.keys(monthlyData).length > 0) {
@@ -2729,7 +2729,7 @@
         // Disclaimer
         doc.setFontSize(9);
         doc.setTextColor(230, 57, 70);
-        doc.text('DISCLAIMER: This is an estimate only. Consult FIRS or a licensed tax professional.', 20, 270);
+        doc.text('DISCLAIMER: This is an estimate only. Consult NRS or a licensed tax professional.', 20, 270);
         
         // Footer
         doc.setFontSize(10);
@@ -2776,7 +2776,7 @@
         
         data.push([]);
         data.push(['DISCLAIMER']);
-        data.push(['This is an estimate only. Consult FIRS or a licensed tax professional for official filing.']);
+        data.push(['This is an estimate only. Consult NRS or a licensed tax professional for official filing.']);
         
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(data);
@@ -2836,7 +2836,7 @@
                     </h3>
                     <p style="line-height: 1.8; opacity: 0.95;">
                         <strong>TaxMe provides tax estimates and educational information only.</strong> 
-                        The calculations provided are based on the Nigeria Tax Act 2025 and current FIRS guidelines, 
+                        The calculations provided are based on the Nigeria Tax Act 2025 and current NRS guidelines, 
                         but are NOT official tax advice or filings.
                     </p>
                     <p style="line-height: 1.8; opacity: 0.95; margin-top: 10px;">
@@ -2844,8 +2844,8 @@
                     </p>
                     <ul style="margin-left: 20px; line-height: 2; opacity: 0.95;">
                         <li>Consult a licensed tax professional or chartered accountant for your specific situation</li>
-                        <li>Verify all calculations with FIRS before filing</li>
-                        <li>File official returns with FIRS by March 31, 2027</li>
+                        <li>Verify all calculations with NRS before filing</li>
+                        <li>File official returns with NRS by March 31, 2027</li>
                         <li>Keep proper documentation and receipts</li>
                         <li>Report any discrepancies to your tax advisor</li>
                     </ul>
@@ -2861,7 +2861,7 @@
                     <div>
                         <h4 style="color: var(--secondary); margin-bottom: 15px;">Official Resources</h4>
                         <ul style="list-style: none; padding: 0; line-height: 2; opacity: 0.9;">
-                            <li><a href="https://www.nrs.gov.ng" target="_blank" style="color: white; text-decoration: none;">🔗 FIRS Official Website</a></li>
+                            <li><a href="https://www.nrs.gov.ng" target="_blank" style="color: white; text-decoration: none;">🔗 NRS Official Website</a></li>
                             <li><a href="https://www.nrs.gov.ng/tax-resources" target="_blank" style="color: white; text-decoration: none;">📚 Tax Resources</a></li>
                             <li><a href="https://www.citn.org" target="_blank" style="color: white; text-decoration: none;">👨‍💼 Find Tax Consultant</a></li>
                         </ul>
@@ -2891,7 +2891,7 @@
             </div>
         </footer>
 
-        <!-- Disclaimer Modal (First Visit) -->
+        <!-- Disclaimer Modal (NRSt Visit) -->
         <div id="disclaimerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; overflow-y: auto;">
             <div style="max-width: 600px; margin: 50px auto; background: white; border-radius: 15px; padding: 40px; position: relative;">
                 <h2 style="color: var(--danger); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
@@ -2915,7 +2915,7 @@
                 <div style="background: rgba(230, 57, 70, 0.1); padding: 20px; border-radius: 10px; margin: 20px 0; border: 2px solid var(--danger);">
                     <h3 style="color: var(--danger); margin-bottom: 15px;">✗ What TaxMe IS NOT:</h3>
                     <ul style="line-height: 2;">
-                        <li>NOT an official FIRS filing system</li>
+                        <li>NOT an official NRS filing system</li>
                         <li>NOT a substitute for professional advice</li>
                         <li>NOT legal or financial advice</li>
                         <li>NOT responsible for any filing errors</li>
@@ -2923,7 +2923,7 @@
                 </div>
                 
                 <div style="background: var(--secondary); color: var(--primary-dark); padding: 15px; border-radius: 8px; margin: 20px 0; font-weight: 600;">
-                    ⚠️ ALWAYS consult a licensed tax professional or FIRS before filing official returns!
+                    ⚠️ ALWAYS consult a licensed tax professional or NRS before filing official returns!
                 </div>
                 
                 <div style="display: flex; gap: 15px; margin-top: 30px;">
