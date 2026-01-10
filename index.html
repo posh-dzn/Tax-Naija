@@ -1395,7 +1395,6 @@
             <p>Track monthly. Plan annually. Stay compliant with 2025 tax laws.</p>
             <div class="hero-buttons">
                 <button class="btn-primary" onclick="showSignup()">Start Free Trial</button>
-                <button class="btn-secondary" onclick="showQuickCalc()">Quick Calculate</button>
             </div>
         </section>
 
@@ -2000,7 +1999,7 @@
             </div>
         </div>
     </div>
-            <!-- Google Analytics -->
+        <!-- Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
@@ -2099,10 +2098,7 @@
         document.getElementById('dashboardPage').classList.remove('active');
     }
 
-    function showQuickCalc() {
-        alert('Quick calculator coming soon! For now, please sign up to access all features.');
-        showSignup();
-    }
+    // ======= Quick Cal =======================
         
     // ==================== AUTHENTICATION FUNCTIONS ====================
     
@@ -3471,7 +3467,7 @@
             currentUser.payment_reference = reference;
             
             // Save to localStorage (in production, save to Supabase)
-            localStorage.setItem('taxnaija_user_' + currentUser.email, JSON.stringify(currentUser));
+            localStorage.setItem('taxme_user_' + currentUser.email, JSON.stringify(currentUser));
             
             // Show success message
             alert('🎉 Welcome to Premium!\n\nYour account has been upgraded successfully.\n\nPayment Reference: ' + reference);
@@ -3486,7 +3482,7 @@
             currentUser.ebook_reference = reference;
             
             // Save to localStorage (in production, save to Supabase)
-            localStorage.setItem('taxnaija_user_' + currentUser.email, JSON.stringify(currentUser));
+            localStorage.setItem('_user_' + currentUser.email, JSON.stringify(currentUser));
             
             // Show success with download link
             const downloadUrl = 'https://example.com/download-ebook'; // Replace with your actual download link
