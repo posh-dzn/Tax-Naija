@@ -12,6 +12,8 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <!-- Paystack Inline JS -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         * {
@@ -366,14 +368,18 @@
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
-            display: inline-block;
+            display: block;           /* ← Changed from inline-block */
+            margin: 0 auto;           /* ← Added: centers the button */
+            width: fit-content;       /* ← Added: button fits text width */
         }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(247, 179, 43, 0.4);
+    
+    .btn-primary:hover {
+        background: var(--primary);
+        color: var(--white);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(247, 179, 43, 0.4);
+    }
         }
-
         .btn-secondary {
             padding: 15px 40px;
             background: transparent;
@@ -1433,13 +1439,7 @@
 
     <button class="btn-primary" onclick="initiatePayment('premium')">
     ⭐ Upgrade to Premium - ₦2,000/year
-    </button>
-
-    <button class="btn-primary" onclick="initiatePayment('ebook')">
-    📚 Buy Ebook - ₦3,000
-    </button>
-
-    
+    </button>    
 
     <!-- Login Page -->
     <div id="loginPage" class="auth-page">
@@ -1525,10 +1525,7 @@
         </div>
     </div>
 
-    <button onclick="initiatePayment()">
-    Upgrade to Premium - ₦1,000/year
-    </button>
-
+   
     <!-- Dashboard -->
     <div id="dashboardPage" class="dashboard">
         <div class="dashboard-container">
@@ -2013,6 +2010,45 @@
         </script>
             
     <script>
+    
+    // ==================== SUPABASE CONFIGURATION ====================
+
+        const SUPABASE_URL = 'https://uxviehpnarspwdlstexu.supabase.co'; // Your project URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dmllaHBuYXJzcHdkbHN0ZXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjcyNTgsImV4cCI6MjA4MzY0MzI1OH0.VZi4fuHRmnkswkgi0XH2HvQQXeoRti4CcsQeUEGE8tc'; // Your anon key
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Current user state
+        let currentUser = null;
+        let currentSession = null;
+        
+        // Check if user is already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                currentSession = session;
+                currentUser = session.user;
+                loadUserProfile();
+                showDashboard();
+            }
+        });
+        
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth event:', event);
+            
+            if (event === 'SIGNED_IN') {
+                currentSession = session;
+                currentUser = session.user;
+                loadUserProfile();
+                showDashboard();
+            } else if (event === 'SIGNED_OUT') {
+                currentSession = null;
+                currentUser = null;
+                showHome();
+            }
+        });    
+        
     // ==================== GLOBAL VARIABLES ====================
 
     // App State
@@ -2068,25 +2104,72 @@
         showSignup();
     }
 
-    function handleLogin(event) {
+
+    // ==================== SUPABASE CONFIGURATION ====================
+    
+    const SUPABASE_URL = 'https://xxxxxxxxxxxxx.supabase.co'; // Your URL here
+    const SUPABASE_ANON_KEY = 'eyJhbGci...'; // Your anon key here
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let currentUser = null;
+    let currentSession = null;
+    
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+            currentSession = session;
+            currentUser = session.user;
+            loadUserProfile();
+            showDashboard();
+        }
+    });
+    
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN') {
+            currentSession = session;
+            currentUser = session.user;
+            loadUserProfile();
+            showDashboard();
+        } else if (event === 'SIGNED_OUT') {
+            currentSession = null;
+            currentUser = null;
+            showHome();
+        }
+    });
+    
+    // ==================== AUTHENTICATION FUNCTIONS ====================
+    
+    async function handleLogin(event) {
         event.preventDefault();
         
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         
-        // Simulate login (In production: API call)
-        const storedUser = localStorage.getItem('TaxMe_user_' + email);
-        
-        if (storedUser) {
-            currentUser = JSON.parse(storedUser);
-            loadUserData();
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) throw error;
+            
+            currentSession = data.session;
+            currentUser = data.user;
+            
+            await loadUserProfile();
             showDashboard();
-        } else {
-            alert('Account not found. Please sign up NRSt.');
+            
+            alert('✅ Welcome back!');
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('❌ Login failed:\n' + error.message);
         }
     }
-
-    function handleSignup(event) {
+    
+    async function handleSignup(event) {
         event.preventDefault();
         
         const name = document.getElementById('signupName').value;
@@ -2094,39 +2177,107 @@
         const password = document.getElementById('signupPassword').value;
         const businessType = document.getElementById('signupBusinessType').value;
         
-        // Create user object
-        currentUser = {
-            name: name,
-            email: email,
-            businessType: businessType,
-            createdAt: new Date().toISOString()
-        };
-        
-        // Save to localStorage
-        localStorage.setItem('TaxMe_user_' + email, JSON.stringify(currentUser));
-        localStorage.setItem('TaxMe_current_user', email);
-        
-        // Show dashboard
-        monthlyData = {};
-        showDashboard();
-    }
-
-    function loginWithGoogle() {
-        alert('Google login coming soon! For now, please use email/password signup.');
-    }
-
-    function signupWithGoogle() {
-        alert('Google signup coming soon! For now, please use email/password signup.');
-    }
-
-    function handleLogout() {
-        if (confirm('Are you sure you want to logout?')) {
-            currentUser = null;
-            monthlyData = {};
-            localStorage.removeItem('TaxMe_current_user');
-            showHome();
+        try {
+            const { data: authData, error: signUpError } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: name
+                    }
+                }
+            });
+            
+            if (signUpError) throw signUpError;
+            
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert({
+                    id: authData.user.id,
+                    email: email,
+                    full_name: name,
+                    business_type: businessType,
+                    tier: 'free',
+                    referral_code: 'TAXNJ-' + Math.random().toString(36).substr(2, 8).toUpperCase()
+                });
+            
+            if (profileError) throw profileError;
+            
+            alert('✅ Account created!\n\nPlease check your email to verify.');
+            showLogin();
+            
+        } catch (error) {
+            console.error('Signup error:', error);
+            alert('❌ Error:\n' + error.message);
         }
     }
+    
+    async function loginWithGoogle() {
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
+            if (error) throw error;
+        } catch (error) {
+            console.error('Google login error:', error);
+            alert('Google login failed: ' + error.message);
+        }
+    }
+    
+    async function signupWithGoogle() {
+        await loginWithGoogle();
+    }
+    
+    async function handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                
+                currentSession = null;
+                currentUser = null;
+                monthlyData = {};
+                showHome();
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Error logging out: ' + error.message);
+            }
+        }
+    }
+    
+    async function loadUserProfile() {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+            
+            if (error) throw error;
+            
+            currentUser.profile = data;
+            currentUser.name = data.full_name;
+            currentUser.businessType = data.business_type;
+            
+            if (document.getElementById('userName')) {
+                document.getElementById('userName').textContent = data.full_name;
+            }
+            if (document.getElementById('userAvatar')) {
+                document.getElementById('userAvatar').textContent = data.full_name.charAt(0).toUpperCase();
+            }
+            
+            if (typeof checkBusinessType === 'function') checkBusinessType();
+            if (typeof checkBusinessTypeForPAYE === 'function') checkBusinessTypeForPAYE();
+            
+        } catch (error) {
+            console.error('Profile load error:', error);
+        }
+    }
+
 
     function showDashboard() {
         document.getElementById('homePage').style.display = 'none';
@@ -2349,7 +2500,7 @@
         }
     }
 
-    function saveMonth() {
+    async function saveMonth() {
         const incomeInput = document.getElementById('monthIncome');
         const expensesInput = document.getElementById('monthExpenses');
         
@@ -2360,6 +2511,50 @@
             alert('Please enter income for this month');
             return;
         }
+        
+        if (income < 0 || expenses < 0) {
+            alert('Income and expenses cannot be negative');
+            return;
+        }
+        
+        if (expenses > income) {
+            if (!confirm('Warning: Expenses exceed income. Continue?')) {
+                return;
+            }
+        }
+        
+        try {
+            const { error } = await supabase
+                .from('monthly_data')
+                .upsert({
+                    user_id: currentUser.id,
+                    year: 2026,
+                    month: currentMonth,
+                    income: income,
+                    expenses: expenses
+                }, {
+                    onConflict: 'user_id,year,month'
+                });
+            
+            if (error) throw error;
+            
+            monthlyData[currentMonth] = {
+                income: income,
+                expenses: expenses,
+                profit: income - expenses
+            };
+            
+            await updateMonthlyDisplay();
+            
+            document.querySelectorAll('.month-btn')[currentMonth - 1].classList.add('completed');
+            
+            alert(`✅ ${monthNames[currentMonth - 1]} data saved!`);
+            
+        } catch (error) {
+            console.error('Save error:', error);
+            alert('❌ Error saving: ' + error.message);
+        }
+    }
         
         // Prevent negative values
         if (income < 0 || expenses < 0) {
@@ -3083,21 +3278,45 @@
 
     // ==================== SECTION 11: DATA PERSISTENCE ====================
 
-    function saveUserData() {
-        if (currentUser) {
-            localStorage.setItem('TaxMe_data_' + currentUser.email, JSON.stringify(monthlyData));
+    async function saveUserData() {
+        if (currentUser && currentUser.id) {
+            // Save is now automatic via saveMonth() function
+            // This function kept for compatibility
+            console.log('Data auto-saved to Supabase');
+        }
+    }
+    
+    async function loadUserData() {
+        try {
+            const { data, error } = await supabase
+                .from('monthly_data')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .eq('year', 2026)
+                .order('month');
+            
+            if (error) throw error;
+            
+            monthlyData = {};
+            data.forEach(row => {
+                monthlyData[row.month] = {
+                    income: parseFloat(row.income),
+                    expenses: parseFloat(row.expenses),
+                    profit: parseFloat(row.profit)
+                };
+                
+                const monthBtn = document.querySelectorAll('.month-btn')[row.month - 1];
+                if (monthBtn) monthBtn.classList.add('completed');
+            });
+            
+            updateMonthlyDisplay();
+            
+        } catch (error) {
+            console.error('Load error:', error);
         }
     }
 
-    function loadUserData() {
-        if (currentUser) {
-            const data = localStorage.getItem('TaxMe_data_' + currentUser.email);
-            if (data) {
-                monthlyData = JSON.parse(data);
-                updateMonthlyDisplay();
-            }
-        }
-    }
+        
 
     // ==================== SECTION 12: COUNTDOWN TIMER ====================
 
@@ -3193,14 +3412,11 @@
         // ==================== PAYSTACK CONFIGURATION ====================
 
         // IMPORTANT: Use TEST keys during development
-        const PAYSTACK_PUBLIC_KEY = 'pk_live_ed6f81d36e15f37470a2089b1fd97869a9a49eeb'; // Replace with YOUR test key
+        const PAYSTACK_PUBLIC_KEY = 'pk_live_ed6f81d36e15f37470a2089b1fd97869a9a49eeb';
         
-        // When going live, replace with:
-        // const PAYSTACK_PUBLIC_KEY = 'pk_live_xxxxxxxxxx';
-        
+                      
         // Payment amounts (in kobo - ₦1 = 100 kobo)
         const PREMIUM_PRICE = 200000; // ₦5,000 in kobo
-        const EBOOK_PRICE = 300000;   // ₦5,000 in kobo
         
         // Paystack takes 1.5% + ₦100
         // On ₦2,000: Fee = ₦175, You receive ₦4,825
@@ -3226,14 +3442,7 @@
                     user_id: currentUser.email,
                     plan: 'yearly'
                 };
-            } else if (productType === 'ebook') {
-                amount = EBOOK_PRICE;
-                metadata = {
-                    product: 'Tax Planning Ebook',
-                    user_id: currentUser.email
-                };
-            }
-            
+            }             
             // Initialize Paystack
             const handler = PaystackPop.setup({
                 key: PAYSTACK_PUBLIC_KEY,
@@ -3323,20 +3532,69 @@
             // In production: Redirect to download page
         }
 
-        function showPAYECalculator() {
-    // Check if user has premium access
-    if (!currentUser || currentUser.tier !== 'premium') {
-        // Show upgrade prompt
-        if (confirm('PAYE Calculator is a Premium feature.\n\nUpgrade now for ₦5,000/year?')) {
-            initiatePayment('premium');
+        async function handlePremiumUpgrade(paystackReference) {
+    try {
+            // 1. Record payment in database
+            const { error: paymentError } = await supabase
+                .from('payments')
+                .insert({
+                    user_id: currentUser.id,
+                    paystack_reference: paystackReference,
+                    amount: 5000,
+                    product_type: 'premium',
+                    status: 'success',
+                    payment_date: new Date().toISOString(),
+                    metadata: {
+                        plan: 'yearly',
+                        email: currentUser.email
+                    }
+                });
+            
+            if (paymentError) throw paymentError;
+            
+            // 2. Upgrade user to premium
+            const premiumExpiry = new Date();
+            premiumExpiry.setFullYear(premiumExpiry.getFullYear() + 1);
+            
+            const { error: upgradeError } = await supabase
+                .from('profiles')
+                .update({
+                    tier: 'premium',
+                    premium_expires_at: premiumExpiry.toISOString()
+                })
+                .eq('id', currentUser.id);
+            
+            if (upgradeError) throw upgradeError;
+            
+            // 3. Update local state
+            currentUser.profile.tier = 'premium';
+            currentUser.profile.premium_expires_at = premiumExpiry.toISOString();
+            
+            alert('🎉 Welcome to Premium!\n\nYour account has been upgraded.\n\nReference: ' + paystackReference);
+            
+            location.reload();
+            
+        } catch (error) {
+            console.error('Upgrade error:', error);
+            alert('❌ Error upgrading account. Contact support with reference: ' + paystackReference);
         }
-        return;
     }
-    
-    // Show PAYE calculator
-    document.getElementById('payeCalculator').classList.remove('hidden');
-}
 
+        function showPAYECalculator() {
+        // Check if user has premium access
+        if (!currentUser || currentUser.tier !== 'premium') {
+            // Show upgrade prompt
+            if (confirm('PAYE Calculator is a Premium feature.\n\nUpgrade now for ₦5,000/year?')) {
+                initiatePayment('premium');
+            }
+            return;
+        }
+        
+        // Show PAYE calculator
+        document.getElementById('payeCalculator').classList.remove('hidden');
+    }
+
+        
     </script>
 
     <!-- Legal Disclaimer Footer -->
