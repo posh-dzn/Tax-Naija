@@ -1513,6 +1513,10 @@
         </div>
     </div>
 
+    <button onclick="initiatePayment()">
+    Upgrade to Premium - ₦1,000/year
+    </button>
+
     <!-- Dashboard -->
     <div id="dashboardPage" class="dashboard">
         <div class="dashboard-container">
@@ -1987,7 +1991,15 @@
             </div>
         </div>
     </div>
-    
+            <!-- Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        </script>
+            
     <script>
     // ==================== GLOBAL VARIABLES ====================
 
@@ -3143,6 +3155,28 @@
     document.addEventListener('DOMContentLoaded', function() {
         checkEbookBannerDisplay();
     });
+
+        // Add to your code:
+        const USER_TIERS = {
+            FREE: 'free',
+            PREMIUM: 'premium'
+        };
+        
+        // Check tier before showing features
+        function checkPremiumAccess() {
+            if (currentUser.tier === USER_TIERS.FREE) {
+                // Show upgrade prompt
+                showUpgradeModal();
+                return false;
+            }
+            return true;
+        }
+        
+        // Block premium features for free users
+        function showPAYECalculator() {
+            if (!checkPremiumAccess()) return;
+            // ... show PAYE calculator
+        }
 
     </script>
 
