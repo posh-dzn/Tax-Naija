@@ -2103,42 +2103,7 @@
         alert('Quick calculator coming soon! For now, please sign up to access all features.');
         showSignup();
     }
-
-
-    // ==================== SUPABASE CONFIGURATION ====================
-    
-    const SUPABASE_URL = 'https://xxxxxxxxxxxxx.supabase.co'; // Your URL here
-    const SUPABASE_ANON_KEY = 'eyJhbGci...'; // Your anon key here
-    
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    let currentUser = null;
-    let currentSession = null;
-    
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-            currentSession = session;
-            currentUser = session.user;
-            loadUserProfile();
-            showDashboard();
-        }
-    });
-    
-    // Listen for auth changes
-    supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN') {
-            currentSession = session;
-            currentUser = session.user;
-            loadUserProfile();
-            showDashboard();
-        } else if (event === 'SIGNED_OUT') {
-            currentSession = null;
-            currentUser = null;
-            showHome();
-        }
-    });
-    
+        
     // ==================== AUTHENTICATION FUNCTIONS ====================
     
     async function handleLogin(event) {
