@@ -10,6 +10,8 @@
 
     <!-- SheetJS for Excel export -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- Paystack Inline JS -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
     
     <style>
         * {
@@ -1428,6 +1430,16 @@
             </div>
         </section>
     </div>
+
+    <button class="btn-primary" onclick="initiatePayment('premium')">
+    ⭐ Upgrade to Premium - ₦2,000/year
+    </button>
+
+    <button class="btn-primary" onclick="initiatePayment('ebook')">
+    📚 Buy Ebook - ₦3,000
+    </button>
+
+    
 
     <!-- Login Page -->
     <div id="loginPage" class="auth-page">
@@ -3177,6 +3189,153 @@
             if (!checkPremiumAccess()) return;
             // ... show PAYE calculator
         }
+
+        // ==================== PAYSTACK CONFIGURATION ====================
+
+        // IMPORTANT: Use TEST keys during development
+        const PAYSTACK_PUBLIC_KEY = 'pk_live_ed6f81d36e15f37470a2089b1fd97869a9a49eeb'; // Replace with YOUR test key
+        
+        // When going live, replace with:
+        // const PAYSTACK_PUBLIC_KEY = 'pk_live_xxxxxxxxxx';
+        
+        // Payment amounts (in kobo - ₦1 = 100 kobo)
+        const PREMIUM_PRICE = 200000; // ₦5,000 in kobo
+        const EBOOK_PRICE = 300000;   // ₦5,000 in kobo
+        
+        // Paystack takes 1.5% + ₦100
+        // On ₦2,000: Fee = ₦175, You receive ₦4,825
+
+        // ==================== PAYMENT FUNCTIONS ====================
+
+        function initiatePayment(productType) {
+            // Check if user is logged in
+            if (!currentUser) {
+                alert('Please login first to make a purchase');
+                showLogin();
+                return;
+            }
+            
+            // Determine amount based on product
+            let amount;
+            let metadata = {};
+            
+            if (productType === 'premium') {
+                amount = PREMIUM_PRICE;
+                metadata = {
+                    product: 'Premium Subscription',
+                    user_id: currentUser.email,
+                    plan: 'yearly'
+                };
+            } else if (productType === 'ebook') {
+                amount = EBOOK_PRICE;
+                metadata = {
+                    product: 'Tax Planning Ebook',
+                    user_id: currentUser.email
+                };
+            }
+            
+            // Initialize Paystack
+            const handler = PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_KEY,
+                email: currentUser.email,
+                amount: amount,
+                currency: 'NGN',
+                ref: 'TXN-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now(),
+                metadata: metadata,
+                
+                // Callback when payment is successful
+                callback: function(response) {
+                    console.log('Payment successful:', response);
+                    verifyPayment(response.reference, productType);
+                },
+                
+                // Called when user closes the payment modal
+                onClose: function() {
+                    console.log('Payment window closed');
+                    alert('Payment cancelled. You can try again anytime!');
+                }
+            });
+            
+            // Open Paystack payment modal
+            handler.openIframe();
+        }
+        
+        // Verify payment on backend (we'll do this on frontend for now)
+        function verifyPayment(reference, productType) {
+            // Show loading
+            const loadingMsg = document.createElement('div');
+            loadingMsg.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                            background: rgba(0,0,0,0.8); display: flex; align-items: center; 
+                            justify-content: center; z-index: 10000;">
+                    <div style="background: white; padding: 40px; border-radius: 15px; text-align: center;">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 20px; color: var(--primary); font-weight: 600;">
+                            Verifying payment...
+                        </p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(loadingMsg);
+            
+            // Simulate verification (in production, verify with backend)
+            setTimeout(() => {
+                document.body.removeChild(loadingMsg);
+                
+                if (productType === 'premium') {
+                    handlePremiumUpgrade(reference);
+                } else if (productType === 'ebook') {
+                    handleEbookPurchase(reference);
+                }
+            }, 2000);
+        }
+        
+        function handlePremiumUpgrade(reference) {
+            // Update user to premium
+            currentUser.tier = 'premium';
+            currentUser.premium_expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+            currentUser.payment_reference = reference;
+            
+            // Save to localStorage (in production, save to Supabase)
+            localStorage.setItem('taxnaija_user_' + currentUser.email, JSON.stringify(currentUser));
+            
+            // Show success message
+            alert('🎉 Welcome to Premium!\n\nYour account has been upgraded successfully.\n\nPayment Reference: ' + reference);
+            
+            // Reload dashboard to show premium features
+            location.reload();
+        }
+        
+        function handleEbookPurchase(reference) {
+            // Record ebook purchase
+            currentUser.ebook_purchased = true;
+            currentUser.ebook_reference = reference;
+            
+            // Save to localStorage (in production, save to Supabase)
+            localStorage.setItem('taxnaija_user_' + currentUser.email, JSON.stringify(currentUser));
+            
+            // Show success with download link
+            const downloadUrl = 'https://example.com/download-ebook'; // Replace with your actual download link
+            
+            alert('🎉 Purchase Successful!\n\nThank you for your purchase!\n\nPayment Reference: ' + reference + '\n\nYour ebook download link will be sent to your email.');
+            
+            // In production: Send email with download link
+            // In production: Redirect to download page
+        }
+
+        function showPAYECalculator() {
+    // Check if user has premium access
+    if (!currentUser || currentUser.tier !== 'premium') {
+        // Show upgrade prompt
+        if (confirm('PAYE Calculator is a Premium feature.\n\nUpgrade now for ₦5,000/year?')) {
+            initiatePayment('premium');
+        }
+        return;
+    }
+    
+    // Show PAYE calculator
+    document.getElementById('payeCalculator').classList.remove('hidden');
+}
 
     </script>
 
