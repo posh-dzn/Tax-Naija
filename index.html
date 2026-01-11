@@ -1395,6 +1395,7 @@
             <p>Track monthly. Plan annually. Stay compliant with 2025 tax laws.</p>
             <div class="hero-buttons">
                 <button class="btn-primary" onclick="showSignup()">Start Free Trial</button>
+
             </div>
         </section>
 
@@ -1999,7 +2000,7 @@
             </div>
         </div>
     </div>
-        <!-- Google Analytics -->
+            <!-- Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
@@ -2010,48 +2011,12 @@
             
     <script>
     
-    // ==================== SUPABASE CONFIGURATION ====================
-
-        const SUPABASE_URL = 'https://uxviehpnarspwdlstexu.supabase.co'; // Your project URL
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dmllaHBuYXJzcHdkbHN0ZXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjcyNTgsImV4cCI6MjA4MzY0MzI1OH0.VZi4fuHRmnkswkgi0XH2HvQQXeoRti4CcsQeUEGE8tc'; // Your anon key
-        
-        // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // Current user state
-        let currentUser = null;
-        let currentSession = null;
-        
-        // Check if user is already logged in
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                currentSession = session;
-                currentUser = session.user;
-                loadUserProfile();
-                showDashboard();
-            }
-        });
-        
-        // Listen for auth state changes
-        supabase.auth.onAuthStateChange((event, session) => {
-            console.log('Auth event:', event);
-            
-            if (event === 'SIGNED_IN') {
-                currentSession = session;
-                currentUser = session.user;
-                loadUserProfile();
-                showDashboard();
-            } else if (event === 'SIGNED_OUT') {
-                currentSession = null;
-                currentUser = null;
-                showHome();
-            }
-        });    
         
     // ==================== GLOBAL VARIABLES ====================
 
     // App State
     let currentUser = null;
+    let currentSession = null;
     let currentMode = 'annual';
     let currentMonth = 1;
     let monthlyData = {};
@@ -2098,8 +2063,56 @@
         document.getElementById('dashboardPage').classList.remove('active');
     }
 
-    // ======= Quick Cal =======================
+
+    // ==================== SUPABASE CONFIGURATION ====================
+    
+    // SAFE initialization - won't break if credentials are invalid
+    let supabase = null;
+    // Note: currentUser, currentSession, and monthlyData are already declared in GLOBAL VARIABLES section
+    
+    try {
+        const SUPABASE_URL = 'https://uxviehpnarspwdlstexu.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dmllaHBuYXJzcHdkbHN0ZXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjcyNTgsImV4cCI6MjA4MzY0MzI1OH0.VZi4fuHRmnkswkgi0XH2HvQQXeoRti4CcsQeUEGE8tc';
         
+        // Only create client if window.supabase exists and credentials look valid
+        if (window.supabase && SUPABASE_URL.includes('.supabase.co') && SUPABASE_ANON_KEY.length > 50) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase initialized successfully');
+            
+            // Check if user is already logged in
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    currentSession = session;
+                    currentUser = session.user;
+                    loadUserProfile();
+                    showDashboard();
+                }
+            }).catch(error => {
+                console.warn('Session check failed:', error);
+            });
+            
+            // Listen for auth changes
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN') {
+                    currentSession = session;
+                    currentUser = session.user;
+                    loadUserProfile();
+                    showDashboard();
+                } else if (event === 'SIGNED_OUT') {
+                    currentSession = null;
+                    currentUser = null;
+                    showHome();
+                }
+            });
+        } else {
+            console.warn('⚠️ Supabase not configured. Using localStorage fallback.');
+            console.warn('To enable cloud sync, replace the placeholder credentials with your actual Supabase project details.');
+        }
+    } catch (error) {
+        console.error('Supabase initialization failed:', error);
+        console.warn('⚠️ Using localStorage fallback mode');
+    }
+    
     // ==================== AUTHENTICATION FUNCTIONS ====================
     
     async function handleLogin(event) {
@@ -2108,25 +2121,52 @@
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+        // If Supabase is configured, use it
+        if (supabase) {
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                currentSession = data.session;
+                currentUser = data.user;
+                
+                await loadUserProfile();
+                showDashboard();
+                
+                alert('✅ Welcome back!');
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('❌ Login failed:\n' + error.message);
+            }
+        } else {
+            // FALLBACK: Use localStorage
+            console.log('Using localStorage fallback for login');
             
-            if (error) throw error;
+            const userStr = localStorage.getItem('taxnaija_user_' + email);
             
-            currentSession = data.session;
-            currentUser = data.user;
+            if (!userStr) {
+                alert('❌ Account not found. Please sign up first.');
+                showSignup();
+                return;
+            }
             
-            await loadUserProfile();
+            const user = JSON.parse(userStr);
+            currentUser = user;
+            currentUser.email = email;
+            
+            // Load user data from localStorage
+            const dataStr = localStorage.getItem('taxnaija_data_' + email);
+            if (dataStr) {
+                monthlyData = JSON.parse(dataStr);
+            }
+            
             showDashboard();
-            
             alert('✅ Welcome back!');
-            
-        } catch (error) {
-            console.error('Login error:', error);
-            alert('❌ Login failed:\n' + error.message);
         }
     }
     
@@ -2138,38 +2178,73 @@
         const password = document.getElementById('signupPassword').value;
         const businessType = document.getElementById('signupBusinessType').value;
         
-        try {
-            const { data: authData, error: signUpError } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        full_name: name
-                    }
-                }
-            });
-            
-            if (signUpError) throw signUpError;
-            
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .insert({
-                    id: authData.user.id,
+        // Validate inputs
+        if (!name || !email || !password || !businessType) {
+            alert('❌ Please fill in all fields');
+            return;
+        }
+        
+        // If Supabase is configured, use it
+        if (supabase) {
+            try {
+                const { data: authData, error: signUpError } = await supabase.auth.signUp({
                     email: email,
-                    full_name: name,
-                    business_type: businessType,
-                    tier: 'free',
-                    referral_code: 'TAXNJ-' + Math.random().toString(36).substr(2, 8).toUpperCase()
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: name
+                        }
+                    }
                 });
+                
+                if (signUpError) throw signUpError;
+                
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: authData.user.id,
+                        email: email,
+                        full_name: name,
+                        business_type: businessType,
+                        tier: 'free',
+                        referral_code: 'TAXNJ-' + Math.random().toString(36).substr(2, 8).toUpperCase()
+                    });
+                
+                if (profileError) throw profileError;
+                
+                alert('✅ Account created!\n\nPlease check your email to verify.');
+                showLogin();
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('❌ Error:\n' + error.message);
+            }
+        } else {
+            // FALLBACK: Use localStorage
+            console.log('Using localStorage fallback for signup');
             
-            if (profileError) throw profileError;
+            // Check if user already exists
+            const existingUser = localStorage.getItem('taxnaija_user_' + email);
+            if (existingUser) {
+                alert('❌ Email already registered. Please login instead.');
+                showLogin();
+                return;
+            }
             
-            alert('✅ Account created!\n\nPlease check your email to verify.');
+            // Create user object
+            const user = {
+                name: name,
+                email: email,
+                businessType: businessType,
+                tier: 'free',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('taxnaija_user_' + email, JSON.stringify(user));
+            
+            alert('✅ Account created!\n\nYou can now login.');
             showLogin();
-            
-        } catch (error) {
-            console.error('Signup error:', error);
-            alert('❌ Error:\n' + error.message);
         }
     }
     
@@ -3467,7 +3542,7 @@
             currentUser.payment_reference = reference;
             
             // Save to localStorage (in production, save to Supabase)
-            localStorage.setItem('taxme_user_' + currentUser.email, JSON.stringify(currentUser));
+            localStorage.setItem('taxnaija_user_' + currentUser.email, JSON.stringify(currentUser));
             
             // Show success message
             alert('🎉 Welcome to Premium!\n\nYour account has been upgraded successfully.\n\nPayment Reference: ' + reference);
@@ -3482,7 +3557,7 @@
             currentUser.ebook_reference = reference;
             
             // Save to localStorage (in production, save to Supabase)
-            localStorage.setItem('_user_' + currentUser.email, JSON.stringify(currentUser));
+            localStorage.setItem('taxnaija_user_' + currentUser.email, JSON.stringify(currentUser));
             
             // Show success with download link
             const downloadUrl = 'https://example.com/download-ebook'; // Replace with your actual download link
