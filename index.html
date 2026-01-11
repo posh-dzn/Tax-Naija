@@ -1395,6 +1395,7 @@
             <p>Track monthly. Plan annually. Stay compliant with 2025 tax laws.</p>
             <div class="hero-buttons">
                 <button class="btn-primary" onclick="showSignup()">Start Free Trial</button>
+
             </div>
         </section>
 
@@ -2010,6 +2011,42 @@
             
     <script>
     
+    // ==================== SUPABASE CONFIGURATION ====================
+
+        const SUPABASE_URL = 'https://uxviehpnarspwdlstexu.supabase.co'; // Your project URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dmllaHBuYXJzcHdkbHN0ZXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjcyNTgsImV4cCI6MjA4MzY0MzI1OH0.VZi4fuHRmnkswkgi0XH2HvQQXeoRti4CcsQeUEGE8tc'; // Your anon key
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('✅ Supabase initialized successfully');
+        
+        // Note: currentUser and currentSession are declared in GLOBAL VARIABLES section
+        
+        // Check if user is already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                currentSession = session;
+                currentUser = session.user;
+                loadUserProfile();
+                showDashboard();
+            }
+        });
+        
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth event:', event);
+            
+            if (event === 'SIGNED_IN') {
+                currentSession = session;
+                currentUser = session.user;
+                loadUserProfile();
+                showDashboard();
+            } else if (event === 'SIGNED_OUT') {
+                currentSession = null;
+                currentUser = null;
+                showHome();
+            }
+        });    
         
     // ==================== GLOBAL VARIABLES ====================
 
@@ -2063,54 +2100,6 @@
     }
 
 
-    // ==================== SUPABASE CONFIGURATION ====================
-    
-    // SAFE initialization - won't break if credentials are invalid
-    let supabase = null;
-    // Note: currentUser, currentSession, and monthlyData are already declared in GLOBAL VARIABLES section
-    
-    try {
-        const SUPABASE_URL = 'https://uxviehpnarspwdlstexu.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dmllaHBuYXJzcHdkbHN0ZXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjcyNTgsImV4cCI6MjA4MzY0MzI1OH0.VZi4fuHRmnkswkgi0XH2HvQQXeoRti4CcsQeUEGE8tc';
-        
-        // Only create client if window.supabase exists and credentials look valid
-        if (window.supabase && SUPABASE_URL.includes('.supabase.co') && SUPABASE_ANON_KEY.length > 50) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase initialized successfully');
-            
-            // Check if user is already logged in
-            supabase.auth.getSession().then(({ data: { session } }) => {
-                if (session) {
-                    currentSession = session;
-                    currentUser = session.user;
-                    loadUserProfile();
-                    showDashboard();
-                }
-            }).catch(error => {
-                console.warn('Session check failed:', error);
-            });
-            
-            // Listen for auth changes
-            supabase.auth.onAuthStateChange((event, session) => {
-                if (event === 'SIGNED_IN') {
-                    currentSession = session;
-                    currentUser = session.user;
-                    loadUserProfile();
-                    showDashboard();
-                } else if (event === 'SIGNED_OUT') {
-                    currentSession = null;
-                    currentUser = null;
-                    showHome();
-                }
-            });
-        } else {
-            console.warn('⚠️ Supabase not configured. Using localStorage fallback.');
-            console.warn('To enable cloud sync, replace the placeholder credentials with your actual Supabase project details.');
-        }
-    } catch (error) {
-        console.error('Supabase initialization failed:', error);
-        console.warn('⚠️ Using localStorage fallback mode');
-    }
     
     // ==================== AUTHENTICATION FUNCTIONS ====================
     
@@ -2120,52 +2109,25 @@
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         
-        // If Supabase is configured, use it
-        if (supabase) {
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-                
-                if (error) throw error;
-                
-                currentSession = data.session;
-                currentUser = data.user;
-                
-                await loadUserProfile();
-                showDashboard();
-                
-                alert('✅ Welcome back!');
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('❌ Login failed:\n' + error.message);
-            }
-        } else {
-            // FALLBACK: Use localStorage
-            console.log('Using localStorage fallback for login');
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
             
-            const userStr = localStorage.getItem('taxnaija_user_' + email);
+            if (error) throw error;
             
-            if (!userStr) {
-                alert('❌ Account not found. Please sign up first.');
-                showSignup();
-                return;
-            }
+            currentSession = data.session;
+            currentUser = data.user;
             
-            const user = JSON.parse(userStr);
-            currentUser = user;
-            currentUser.email = email;
-            
-            // Load user data from localStorage
-            const dataStr = localStorage.getItem('taxnaija_data_' + email);
-            if (dataStr) {
-                monthlyData = JSON.parse(dataStr);
-            }
-            
+            await loadUserProfile();
             showDashboard();
+            
             alert('✅ Welcome back!');
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('❌ Login failed:\n' + error.message);
         }
     }
     
@@ -2177,73 +2139,38 @@
         const password = document.getElementById('signupPassword').value;
         const businessType = document.getElementById('signupBusinessType').value;
         
-        // Validate inputs
-        if (!name || !email || !password || !businessType) {
-            alert('❌ Please fill in all fields');
-            return;
-        }
-        
-        // If Supabase is configured, use it
-        if (supabase) {
-            try {
-                const { data: authData, error: signUpError } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: name
-                        }
-                    }
-                });
-                
-                if (signUpError) throw signUpError;
-                
-                const { error: profileError } = await supabase
-                    .from('profiles')
-                    .insert({
-                        id: authData.user.id,
-                        email: email,
-                        full_name: name,
-                        business_type: businessType,
-                        tier: 'free',
-                        referral_code: 'TAXNJ-' + Math.random().toString(36).substr(2, 8).toUpperCase()
-                    });
-                
-                if (profileError) throw profileError;
-                
-                alert('✅ Account created!\n\nPlease check your email to verify.');
-                showLogin();
-                
-            } catch (error) {
-                console.error('Signup error:', error);
-                alert('❌ Error:\n' + error.message);
-            }
-        } else {
-            // FALLBACK: Use localStorage
-            console.log('Using localStorage fallback for signup');
-            
-            // Check if user already exists
-            const existingUser = localStorage.getItem('taxnaija_user_' + email);
-            if (existingUser) {
-                alert('❌ Email already registered. Please login instead.');
-                showLogin();
-                return;
-            }
-            
-            // Create user object
-            const user = {
-                name: name,
+        try {
+            const { data: authData, error: signUpError } = await supabase.auth.signUp({
                 email: email,
-                businessType: businessType,
-                tier: 'free',
-                createdAt: new Date().toISOString()
-            };
+                password: password,
+                options: {
+                    data: {
+                        full_name: name
+                    }
+                }
+            });
             
-            // Save to localStorage
-            localStorage.setItem('taxnaija_user_' + email, JSON.stringify(user));
+            if (signUpError) throw signUpError;
             
-            alert('✅ Account created!\n\nYou can now login.');
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert({
+                    id: authData.user.id,
+                    email: email,
+                    full_name: name,
+                    business_type: businessType,
+                    tier: 'free',
+                    referral_code: 'TAXNJ-' + Math.random().toString(36).substr(2, 8).toUpperCase()
+                });
+            
+            if (profileError) throw profileError;
+            
+            alert('✅ Account created!\n\nPlease check your email to verify.');
             showLogin();
+            
+        } catch (error) {
+            console.error('Signup error:', error);
+            alert('❌ Error:\n' + error.message);
         }
     }
     
@@ -2619,7 +2546,8 @@
         document.querySelectorAll('.month-btn')[currentMonth - 1].classList.add('completed');
         
         alert(`${monthNames[currentMonth - 1]} data saved successfully!`);
-        
+    }
+
     function clearMonth() {
         if (confirm(`Are you sure you want to clear ${monthNames[currentMonth - 1]} data? This cannot be undone.`)) {
             delete monthlyData[currentMonth];
@@ -3743,64 +3671,6 @@
                 </button>
             </div>
         </div>
-
-    <script>
-    /* =========================
-       PAGE SWITCHING HELPERS
-    ========================= */
-    
-    const pages = {
-        home: document.getElementById("homePage"),
-        login: document.getElementById("loginPage"),
-        signup: document.getElementById("signupPage"),
-        dashboard: document.getElementById("dashboardPage")
-    };
-    
-    function hideAllPages() {
-        Object.values(pages).forEach(p => p && (p.style.display = "none"));
-    }
-    
-    function showHome() {
-        hideAllPages();
-        if (pages.home) pages.home.style.display = "block";
-    }
-    
-    function showLogin() {
-        hideAllPages();
-        if (pages.login) pages.login.style.display = "flex";
-    }
-    
-    function showSignup() {
-        hideAllPages();
-        if (pages.signup) pages.signup.style.display = "flex";
-    }
-    
-    function showDashboard() {
-        hideAllPages();
-        if (pages.dashboard) pages.dashboard.style.display = "block";
-    }
-    
-    /* =========================
-       INITIAL LOAD
-    ========================= */
-    document.addEventListener("DOMContentLoaded", () => {
-        showHome(); // default landing
-    });
-    
-    /* =========================
-       BURGER MENU SUPPORT
-    ========================= */
-    const burger = document.querySelector(".burger-menu");
-    const navMenu = document.getElementById("navMenu");
-    
-    if (burger && navMenu) {
-        burger.addEventListener("click", () => {
-            burger.classList.toggle("active");
-            navMenu.classList.toggle("active");
-        });
-    }
-    </script>
-
 
 </body>
 </html>
