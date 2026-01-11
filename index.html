@@ -1395,7 +1395,6 @@
             <p>Track monthly. Plan annually. Stay compliant with 2025 tax laws.</p>
             <div class="hero-buttons">
                 <button class="btn-primary" onclick="showSignup()">Start Free Trial</button>
-
             </div>
         </section>
 
@@ -2620,8 +2619,7 @@
         document.querySelectorAll('.month-btn')[currentMonth - 1].classList.add('completed');
         
         alert(`${monthNames[currentMonth - 1]} data saved successfully!`);
-    }
-
+        
     function clearMonth() {
         if (confirm(`Are you sure you want to clear ${monthNames[currentMonth - 1]} data? This cannot be undone.`)) {
             delete monthlyData[currentMonth];
@@ -3745,6 +3743,64 @@
                 </button>
             </div>
         </div>
+
+    <script>
+    /* =========================
+       PAGE SWITCHING HELPERS
+    ========================= */
+    
+    const pages = {
+        home: document.getElementById("homePage"),
+        login: document.getElementById("loginPage"),
+        signup: document.getElementById("signupPage"),
+        dashboard: document.getElementById("dashboardPage")
+    };
+    
+    function hideAllPages() {
+        Object.values(pages).forEach(p => p && (p.style.display = "none"));
+    }
+    
+    function showHome() {
+        hideAllPages();
+        if (pages.home) pages.home.style.display = "block";
+    }
+    
+    function showLogin() {
+        hideAllPages();
+        if (pages.login) pages.login.style.display = "flex";
+    }
+    
+    function showSignup() {
+        hideAllPages();
+        if (pages.signup) pages.signup.style.display = "flex";
+    }
+    
+    function showDashboard() {
+        hideAllPages();
+        if (pages.dashboard) pages.dashboard.style.display = "block";
+    }
+    
+    /* =========================
+       INITIAL LOAD
+    ========================= */
+    document.addEventListener("DOMContentLoaded", () => {
+        showHome(); // default landing
+    });
+    
+    /* =========================
+       BURGER MENU SUPPORT
+    ========================= */
+    const burger = document.querySelector(".burger-menu");
+    const navMenu = document.getElementById("navMenu");
+    
+    if (burger && navMenu) {
+        burger.addEventListener("click", () => {
+            burger.classList.toggle("active");
+            navMenu.classList.toggle("active");
+        });
+    }
+    </script>
+
 
 </body>
 </html>
