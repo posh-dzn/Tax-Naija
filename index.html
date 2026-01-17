@@ -3468,7 +3468,7 @@
             currentUser.payment_reference = reference;
             
             // Save to localStorage (in production, save to Supabase)
-            localStorage.setItem('taxnaija_user_' + currentUser.email, JSON.stringify(currentUser));
+            localStorage.setItem('taxme_user_' + currentUser.email, JSON.stringify(currentUser));
             
             // Show success message
             alert('🎉 Welcome to Premium!\n\nYour account has been upgraded successfully.\n\nPayment Reference: ' + reference);
@@ -3483,7 +3483,7 @@
             currentUser.ebook_reference = reference;
             
             // Save to localStorage (in production, save to Supabase)
-            localStorage.setItem('taxnaija_user_' + currentUser.email, JSON.stringify(currentUser));
+            localStorage.setItem('taxme_user_' + currentUser.email, JSON.stringify(currentUser));
             
             // Show success with download link
             const downloadUrl = 'https://example.com/download-ebook'; // Replace with your actual download link
