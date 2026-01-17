@@ -12,8 +12,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <!-- Paystack Inline JS -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
-    <!-- Supabase Client Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         * {
@@ -2010,43 +2008,7 @@
         </script>
             
     <script>
-    
-    // ==================== SUPABASE CONFIGURATION ====================
 
-        const SUPABASE_URL = 'https://uxviehpnarspwdlstexu.supabase.co'; // Your project URL
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dmllaHBuYXJzcHdkbHN0ZXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjcyNTgsImV4cCI6MjA4MzY0MzI1OH0.VZi4fuHRmnkswkgi0XH2HvQQXeoRti4CcsQeUEGE8tc'; // Your anon key
-        
-        // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('✅ Supabase initialized successfully');
-        
-        // Note: currentUser and currentSession are declared in GLOBAL VARIABLES section
-        
-        // Check if user is already logged in
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                currentSession = session;
-                currentUser = session.user;
-                loadUserProfile();
-                showDashboard();
-            }
-        });
-        
-        // Listen for auth state changes
-        supabase.auth.onAuthStateChange((event, session) => {
-            console.log('Auth event:', event);
-            
-            if (event === 'SIGNED_IN') {
-                currentSession = session;
-                currentUser = session.user;
-                loadUserProfile();
-                showDashboard();
-            } else if (event === 'SIGNED_OUT') {
-                currentSession = null;
-                currentUser = null;
-                showHome();
-            }
-        });    
         
     // ==================== GLOBAL VARIABLES ====================
 
